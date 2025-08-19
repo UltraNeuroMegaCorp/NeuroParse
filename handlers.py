@@ -1,14 +1,16 @@
-import json
-
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, filters
 
-from config import CONTROL_CHAT_ID
+from config import CONTROL_CHAT_ID, TARGET_CHAT_ID
 from db_handlers import DbHandler
 from db import SessionLocal
 
+TARGET_USERNAME = None
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, target_username=None):
+    global TARGET_USERNAME
+
     db = SessionLocal()
     db_handler = DbHandler(db)
 
@@ -16,10 +18,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not msg:
         return
 
+    if msg.chat.id != int(TARGET_CHAT_ID):
+        return
+
     chat_title = msg.chat.title
     username = msg.from_user.username or msg.from_user.first_name
     text = msg.text
     message_time = msg.date
+
+    if TARGET_USERNAME and username != TARGET_USERNAME:
+        return
 
     reply_to_user_username = None
     reply_to_text = None
@@ -39,6 +47,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     print(f"[{chat_title}] {username}: {text}")
 
     db.close()
+
 
 message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message)
 
@@ -68,19 +77,24 @@ async def listen_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def target_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    app = context.application
+
+    global TARGET_USERNAME
+
     if update.message.chat.id != int(CONTROL_CHAT_ID):
         return
     db = SessionLocal()
-
-    message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message)
-
-    db_handler = DbHandler(db)
 
     if not context.args:
         await update.message.reply_text("Используй: /target username")
         return
 
     username = context.args[0].lstrip("@")
+    TARGET_USERNAME = username
+
+    if message_handler not in app.handlers.get(0, []):
+        app.add_handler(message_handler)
+
     await update.message.reply_text(f"Теперь слушаю только @{username}")
     db.close()
 
