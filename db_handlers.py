@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from models import Message
+import json
 
 
 class DbHandler:
@@ -9,13 +10,27 @@ class DbHandler:
     def add_message(self, chat_title, username,
                     message_text, message_time,
                     reply_to_user_username=None, reply_to_text=None):
+
+        tmp = {
+            "chat_title": chat_title,
+            "username": username,
+            "message_text": message_text,
+            "message_time": message_time.isoformat(),
+            "reply_to_user_username": reply_to_user_username,
+            "reply_to_text": reply_to_text,
+        }
+
+        full_message_json = json.dumps(tmp)
+        print(full_message_json)
+
         msg = Message(
             chat_title=chat_title,
             username=username,
             message_text=message_text,
             message_time=message_time,
             reply_to_user_username=reply_to_user_username,
-            reply_to_text=reply_to_text
+            reply_to_text=reply_to_text,
+            raw_json=full_message_json,
         )
         self.db.add(msg)
         self.db.commit()
@@ -24,9 +39,3 @@ class DbHandler:
 
     def get_all(self):
         return self.db.query(Message).all()
-
-    def get_by_user(self, user_id: int):
-        return self.db.query(Message).filter(Message.user_id == user_id).all()
-
-    def get_chat_messages(self, chat_id: int):
-        return self.db.query(Message).filter(Message.chat_id == chat_id).all()
