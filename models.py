@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, JSON
-from db import Base
+from db import BaseListener, BaseMessage
 from datetime import datetime
 
 
-class Message(Base):
+class Message(BaseMessage):
     __tablename__ = "messages"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -19,7 +19,7 @@ class Message(Base):
         return f"<Message {self.id} {self.username}: {self.message_text[:20]}>"
 
 
-class Listener(Base):
+class Listener(BaseListener):
     __tablename__ = "listener"
 
     id = Column(Integer, primary_key=True, index=True)

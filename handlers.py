@@ -3,16 +3,14 @@ from telegram.ext import ContextTypes, MessageHandler, filters
 
 from config import CONTROL_CHAT_ID, TARGET_CHAT_ID
 from db_handlers import DbHandler
-from db import SessionLocal
+from db import SessionLocalMessage, SessionLocalListener
+from models import Message, Listener
 
 TARGET_USERNAME = None
 
 
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, target_username=None):
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global TARGET_USERNAME
-
-    db = SessionLocal()
-    db_handler = DbHandler(db)
 
     msg = update.message
     if not msg:
@@ -26,8 +24,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, tar
     text = msg.text
     message_time = msg.date
 
-    if TARGET_USERNAME and username != TARGET_USERNAME:
-        return
+    if TARGET_USERNAME:
+        if username != TARGET_USERNAME:
+            return
+        db = SessionLocalListener()
+        db_handler = DbHandler(db, Listener)
+    else:
+        db = SessionLocalMessage()
+        db_handler = DbHandler(db, Message)
 
     reply_to_user_username = None
     reply_to_text = None
@@ -83,7 +87,7 @@ async def target_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if update.message.chat.id != int(CONTROL_CHAT_ID):
         return
-    db = SessionLocal()
+    db = SessionLocalListener()
 
     if not context.args:
         await update.message.reply_text("Используй: /target username")
@@ -97,6 +101,23 @@ async def target_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(f"Теперь слушаю только @{username}")
     db.close()
+
+
+async def stop_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global TARGET_USERNAME
+    app = context.application
+
+    if update.message.chat.id != int(CONTROL_CHAT_ID):
+        return
+
+    if TARGET_USERNAME is None:
+        await update.message.reply_text("⚠️ Целевой пользователь не выбран")
+        return
+
+    TARGET_USERNAME = None
+    app.remove_handler(message_handler)
+    await update.message.reply_text("⛔️ Прослушивание пользователя остановлено")
+
 
 
 async def get_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):

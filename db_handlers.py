@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
-from models import Message
 import json
 
 
 class DbHandler:
-    def __init__(self, db: Session):
+    def __init__(self, db: Session, model):
         self.db = db
+        self.model = model
 
     def add_message(self, chat_title, username,
                     message_text, message_time,
@@ -20,10 +20,10 @@ class DbHandler:
             "reply_to_text": reply_to_text,
         }
 
-        full_message_json = json.dumps(tmp)
+        full_message_json = json.dumps(tmp, ensure_ascii=False)
         print(full_message_json)
 
-        msg = Message(
+        msg = self.model(
             chat_title=chat_title,
             username=username,
             message_text=message_text,
@@ -38,4 +38,4 @@ class DbHandler:
         return msg
 
     def get_all(self):
-        return self.db.query(Message).all()
+        return self.db.query(self.model).all()
