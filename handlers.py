@@ -2,6 +2,8 @@ import json
 
 from telegram import Update
 from telegram.ext import ContextTypes, MessageHandler, filters
+
+from config import CONTROL_CHAT_ID
 from db_handlers import DbHandler
 from db import SessionLocal
 
@@ -42,6 +44,8 @@ message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), handle_messa
 
 
 async def listen_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.chat.id != int(CONTROL_CHAT_ID):
+        return
     app = context.application
     args = context.args
 
@@ -64,6 +68,8 @@ async def listen_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def target_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.chat.id != int(CONTROL_CHAT_ID):
+        return
     db = SessionLocal()
 
     message_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message)
@@ -77,3 +83,10 @@ async def target_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     username = context.args[0].lstrip("@")
     await update.message.reply_text(f"Теперь слушаю только @{username}")
     db.close()
+
+
+async def get_chat_id(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.chat.id != int(CONTROL_CHAT_ID):
+        return
+    chat_id = update.message.chat.id
+    await update.message.reply_text(f"Chat ID: {chat_id}")

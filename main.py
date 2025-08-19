@@ -1,8 +1,7 @@
 from telegram.ext import ApplicationBuilder, MessageHandler, filters, CommandHandler
 from config import BOT_TOKEN
 from db import Base, engine
-from handlers import listen_command, target_command
-
+from handlers import listen_command, target_command, get_chat_id
 
 
 def main():
@@ -10,6 +9,7 @@ def main():
 
     app = ApplicationBuilder().token(BOT_TOKEN).build()
 
+    app.add_handler(CommandHandler("get_chat_id", get_chat_id))
     app.add_handler(CommandHandler("listen", listen_command))
     app.add_handler(CommandHandler("target", target_command))
 
