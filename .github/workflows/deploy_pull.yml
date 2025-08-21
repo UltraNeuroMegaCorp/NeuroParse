@@ -1,20 +1,27 @@
 name: Deploy Pull
-
 on:
-  workflow_dispatch:
-
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
+      
 jobs:
   docker_pull:
     runs-on: ubuntu-latest
     steps:
+      - name: Verify secrets
+        run: |
+          if [ -z "${{ secrets.DOCKER_USERNAME }}" ]; then echo "DOCKER_USERNAME is missing"; exit 1; fi
+          if [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then echo "DOCKERHUB_TOKEN is missing"; exit 1; fi
+          if [ -z "${{ secrets.HOST_IP }}" ]; then echo "HOST_IP is missing"; exit 1; fi
+          if [ -z "${{ secrets.HOST_USER }}" ]; then echo "HOST_USER is missing"; exit 1; fi
+          if [ -z "${{ secrets.HOST_SSH_KEY }}" ]; then echo "HOST_SSH_KEY is missing"; exit 1; fi
       - name: Pull Docker image
-        uses: appleboy/ssh-action@v0.1.8
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-            sudo docker stop neuro_parse || true
-            sudo docker rm neuro_parse || true
-            sudo docker pull --progress=plain tomsh666/neuro_parse:latest
+            sudo docker pull tomsh666/neuro_parse:latest

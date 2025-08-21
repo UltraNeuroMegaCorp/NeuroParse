@@ -1,12 +1,27 @@
 name: Deploy Run
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy Pull"]
+    types:
+      - completed
 
 jobs:
   docker_run:
     runs-on: ubuntu-latest
+    environment: production
+    env:
+      MESSAGE_DB_PATH: ${{ vars.MESSAGE_DB_PATH }}
+      LISTENER_DB_PATH: ${{ vars.LISTENER_DB_PATH }}
     steps:
+      - name: Verify environment variables
+        run: |
+          echo "MESSAGE_DB_PATH=$MESSAGE_DB_PATH"
+          echo "LISTENER_DB_PATH=$LISTENER_DB_PATH"
+          if [ -z "${{ secrets.BOT_TOKEN }}" ]; then echo "BOT_TOKEN is missing"; exit 1; fi
+          if [ -z "${{ secrets.CONTROL_CHAT_ID }}" ]; then echo "CONTROL_CHAT_ID is missing"; exit 1; fi
+          if [ -z "${{ secrets.TARGET_CHAT_ID }}" ]; then echo "TARGET_CHAT_ID is missing"; exit 1; fi
+
       - name: Run Docker container
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -14,13 +29,19 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
+            echo "Starting deployment..."
+            echo "MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}"
+            echo "LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}"
+            if [ "$(sudo docker ps -aq -f name=neuro_parse)" ]; then
+              echo "Stopping and removing existing container..."
+              sudo docker stop neuro_parse && sudo docker rm neuro_parse
+            fi
             sudo docker run -d \
               --name neuro_parse \
               -p 8085:80 \
               -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
-              -e MESSAGE_DB_PATH=${{ secrets.MESSAGE_DB_PATH }} \
-              -e LISTENER_DB_PATH=${{ secrets.LISTENER_DB_PATH }} \
+              -e MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }} \
+              -e LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }} \
               -e CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }} \
               -e TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} \
               tomsh666/neuro_parse:latest
-            sudo docker ps | grep neuro_parse
