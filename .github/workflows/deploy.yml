@@ -19,14 +19,24 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             echo "${{ secrets.DOCKERHUB_TOKEN }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+            
+            # Создаём временный .env прямо на сервере
+            cat <<EOF > ~/neuro_parse.env
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            MESSAGE_DB_PATH=${{ env.MESSAGE_DB_PATH }}
+            LISTENER_DB_PATH=${{ env.LISTENER_DB_PATH }}
+            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
+            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            EOF
+
             sudo docker stop neuro_parse || true
             sudo docker rm neuro_parse || true
             sudo docker pull tomsh666/neuro_parse:latest
             sudo docker run -d \
               --name neuro_parse \
               -p 8085:80 \
-              -e DB_HOST=${{ secrets.DB_HOST }} \
-              -e DB_USER=${{ secrets.DB_USER }} \
-              -e DB_PASS=${{ secrets.DB_PASS }} \
+              --env-file ~/neuro_parse.env \
               tomsh666/neuro_parse:latest
+
             sudo docker ps | grep neuro_parse
+            rm ~/neuro_parse.env  # удаляем файл после запуска
