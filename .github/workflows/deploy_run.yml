@@ -1,7 +1,10 @@
 name: Deploy Run
 
 on:
-  workflow_dispatch:
+  workflow_run:
+    workflows: ["Deploy Pull"]
+    types:
+      - completed
 
 jobs:
   docker_run:
