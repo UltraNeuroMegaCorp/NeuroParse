@@ -14,6 +14,13 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
+            # Остановить и удалить контейнер, если он есть
+            if [ "$(sudo docker ps -aq -f name=neuro_parse)" ]; then
+              sudo docker stop neuro_parse || true
+              sudo docker rm neuro_parse || true
+            fi
+
+            # Запустить новый контейнер
             sudo docker run -d \
               --name neuro_parse \
               -p 8085:80 \
@@ -23,4 +30,6 @@ jobs:
               -e CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }} \
               -e TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} \
               tomsh666/neuro_parse:latest
+
+            # Проверка контейнера
             sudo docker ps | grep neuro_parse
