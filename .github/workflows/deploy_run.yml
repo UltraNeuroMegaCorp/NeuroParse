@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 env:
-  env_var: ${{ vars..env }}
+  env_var: ${{ vars.env }}
 
 jobs:
   docker_run:
