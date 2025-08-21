@@ -9,8 +9,8 @@ jobs:
     steps:
       - name: Show environment variables (safe)
         run: |
-          echo "MESSAGE_DB_PATH=${{ env.MESSAGE_DB_PATH }}"
-          echo "LISTENER_DB_PATH=${{ env.LISTENER_DB_PATH }}"
+          echo "MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}"
+          echo "LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}"
       
       - name: Run Docker container
         uses: appleboy/ssh-action@v0.1.8
@@ -31,8 +31,8 @@ jobs:
               --name neuro_parse \
               -p 8085:80 \
               -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
-              -e MESSAGE_DB_PATH=${{ env.MESSAGE_DB_PATH }} \
-              -e LISTENER_DB_PATH=${{ env.LISTENER_DB_PATH }} \
+              -e MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }} \
+              -e LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }} \
               -e CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }} \
               -e TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} \
               tomsh666/neuro_parse:latest
