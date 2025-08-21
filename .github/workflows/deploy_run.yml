@@ -19,8 +19,10 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            echo "MESSAGE_DB_PATH=$MESSAGE_DB_PATH"
-            echo "LISTENER_DB_PATH=$LISTENER_DB_PATH"
+            echo "MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}"
+            echo "LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}"
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}"
+            echo "CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}"
 
             if [ "$(sudo docker ps -aq -f name=neuro_parse)" ]; then
               sudo docker stop neuro_parse || true
