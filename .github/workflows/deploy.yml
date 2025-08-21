@@ -23,7 +23,7 @@ jobs:
             sudo docker stop neuro_parse || true
             sudo docker rm neuro_parse || true
             sudo docker pull tomsh666/neuro_parse:latest
-            sudo docker run -d \
+            sudo docker run \
             --name neuro_parse \
             -p 8085:80 \
             -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
