@@ -40,7 +40,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: false
-          tags: tomsh666/neuroparse:latest
+          tags: tomsh666/neuro_parse:latest
 
   push-image:
     needs: build-image
@@ -50,7 +50,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: tomsh666/neuroparse:latest
+          tags: tomsh666/neuro_parse:latest
 
   deploy:
     needs: push-image
@@ -62,7 +62,7 @@ jobs:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
-          script: docker stop neuroparse || true
+          script: docker stop neuro_parse || true
 
       - name: Remove old container
         uses: appleboy/ssh-action@v0.1.8
@@ -70,7 +70,7 @@ jobs:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
-          script: docker rm neuroparse || true
+          script: docker rm neuro_parse || true
 
       - name: Run new container
         uses: appleboy/ssh-action@v0.1.8
@@ -78,7 +78,7 @@ jobs:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
-          script: docker run -d --name neuroparse -p 8085:80 --env-file .env tomsh666/neuroparse:latest
+          script: docker run -d --name neuro_parse -p 8085:80 --env-file .env tomsh666/neuro_parse:latest
 
       - name: Check container status
         uses: appleboy/ssh-action@v0.1.8
@@ -86,4 +86,4 @@ jobs:
           host: ${{ secrets.HOST_IP }}
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
-          script: docker ps | grep neuroparse
+          script: docker ps | grep neuro_parse
