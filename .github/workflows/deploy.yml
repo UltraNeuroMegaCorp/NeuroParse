@@ -1,10 +1,14 @@
 name: Deploy to VM
 
 on:
-  workflow_dispatch:   # Только ручной запуск (можно поменять на push)
+  workflow_run:
+    workflows: ["Build and Push Docker Image"]
+    types:
+      - completed
 
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Deploy via SSH
