@@ -39,14 +39,14 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            docker stop neuro_parse || true
-            docker rm neuro_parse || true
-            docker pull tomsh666/neuro_parse:latest
-            docker run -d \
+            sudo docker stop neuro_parse || true
+            sudo docker rm neuro_parse || true
+            sudo docker pull tomsh666/neuro_parse:latest
+            sudo docker run -d \
               --name neuro_parse \
               -p 8085:80 \
               -e DB_HOST=${{ secrets.DB_HOST }} \
               -e DB_USER=${{ secrets.DB_USER }} \
               -e DB_PASS=${{ secrets.DB_PASS }} \
               tomsh666/neuro_parse:latest
-            docker ps | grep neuro_parse
+            sudo docker ps | grep neuro_parse
