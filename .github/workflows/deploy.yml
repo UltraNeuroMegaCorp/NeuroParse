@@ -6,9 +6,8 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -26,8 +25,12 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: tomsh666/neuro_parse:latest
+          tags: tomsh666/neuroparse:latest
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to VM
         uses: appleboy/ssh-action@v0.1.8
         with:
@@ -35,7 +38,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            docker pull yourusername/yourapp:latest
-            docker stop myapp || true
-            docker rm myapp || true
-            docker run -d --name myapp --env-file .env -p 80:80 yourusername/yourapp:latest
+            docker pull tomsh666/neuroparse:latest
+            docker stop neuroparse || true
+            docker rm neuroparse || true
+            docker run -d --name neuroparse -p 8085:80 --env-file .env tomsh666/neuroparse:latest
