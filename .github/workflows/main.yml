@@ -39,6 +39,5 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            cd /path/to/your/project
             docker-compose pull
             docker-compose up -d --remove-orphans
