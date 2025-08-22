@@ -34,7 +34,7 @@ jobs:
     steps:
       - name: Copy docker-compose to VM
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.yml user@${{ secrets.VM_HOST }}:{{ secrets.DIR }}
+          scp -o StrictHostKeyChecking=no docker-compose.yml {{ secrets.HOST_USER }}@${{ secrets.VM_HOST }}:{{ secrets.DIR }}
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
         with:
