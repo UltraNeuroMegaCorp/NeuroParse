@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Check docker-compose
+        run: ls -l ${{ github.workspace }}
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
