@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    depends_on:
+      - model-api
+    environment:
+      - BOT_TOKEN=${BOT_TOKEN}
+      - MESSAGE_DB_PATH=${MESSAGE_DB_PATH}
+      - LISTENER_DB_PATH=${LISTENER_DB_PATH}
+      - CONTROL_CHAT_ID=${CONTROL_CHAT_ID}
+      - TARGET_CHAT_ID=${TARGET_CHAT_ID}
+      - MODEL_API_URL=${MODEL_API_URL}
+    ports:
+      - "8085:8085"
+    restart: always
+    networks:
+      - app_network
+
+  model-api:
+    build:
+      context: ./model_api
+      dockerfile: Dockerfile
+    ports:
+      - "8086:8086"
+    restart: always
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
