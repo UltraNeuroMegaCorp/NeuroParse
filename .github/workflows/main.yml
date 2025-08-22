@@ -3,7 +3,7 @@ name: CI/CD Deploy
 on:
   push:
     branches:
-      - main  # Запускаем при пуше в main
+      - master
 
 jobs:
   build-and-push:
