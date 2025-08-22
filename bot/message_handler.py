@@ -2,19 +2,17 @@ import asyncio
 import os
 import uuid
 
-import whisper
+import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config import TARGET_CHAT_ID
+from config import TARGET_CHAT_ID, MODEL_API_URL
 from db import SessionLocalListener, SessionLocalMessage
 from db_handlers import DbHandler
 from models import Listener, Message
 
 VOICES_DIR = "voice_messages"
 os.makedirs(VOICES_DIR, exist_ok=True)
-
-whisper_model = whisper.load_model("medium")
 
 
 def save_message(msg, text, db_model):
@@ -65,15 +63,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await file.download_to_drive(file_path)
         print(f"🎤 Голосовое сохранено: {file_path}")
 
-        loop = asyncio.get_event_loop()
-        result = await loop.run_in_executor(None, lambda: whisper_model.transcribe(file_path, fp16=False))
-        text = result["text"].strip()
-        print(f"✅ Распознанный текст: {text}")
+        with open(file_path, "rb") as f:
+            response = requests.post(MODEL_API_URL, files={"file": f})
+
+        if response.status_code == 200:
+            text = response.json().get("text", "").strip()
+            print(f"✅ Распознанный текст: {text}")
+        else:
+            print(f"❌ Ошибка API: {response.text}")
+            return
 
         os.remove(file_path)
         print(f"🗑️ Файл удалён: {file_path}")
     else:
-        return  # если не текст и не голосовое
+        return
 
     db_model = Listener if target_username else Message
     save_message(msg, text, db_model)
