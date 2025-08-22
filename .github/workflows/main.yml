@@ -43,6 +43,7 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             mkdir -p ${{ secrets.DIR }}
+            sudo chown $USER:$USER ${{ secrets.DIR }}
 
       - name: Copy docker-compose to VM
         run: |
