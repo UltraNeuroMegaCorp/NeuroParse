@@ -6,19 +6,26 @@ on:
       - Tomsh666-patch-1
 
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Check docker-compose
-        run: ls -l ${{ github.workspace }}
-      - name: Copy docker-compose to VM
-        uses: appleboy/scp-action@v0.1.7
+      - uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          host: ${{ secrets.HOST_IP }}
-          username: ${{ secrets.HOST_USER }}
-          key: ${{ secrets.HOST_SSH_KEY }}
-          source: "${{ github.workspace }}/docker-compose.yml"
-          target: "${{ secrets.DIR }}"
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push bot image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/bot:latest ./bot
+          docker push ${{ secrets.DOCKER_USERNAME }}/bot:latest
+
+      - name: Build and push model-api image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/model-api:latest ./model_api
+          docker push ${{ secrets.DOCKER_USERNAME }}/model-api:latest
   
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -27,6 +34,24 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            cd ${{ secrets.DIR }}
-            docker-compose pull
-            docker-compose up -d --remove-orphans
+            echo "Pulling images..."
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/bot:latest
+            sudo docker pull ${{ secrets.DOCKER_USERNAME }}/model-api:latest
+      
+            echo "Stopping old containers..."
+            sudo docker stop bot || true
+            sudo docker rm bot || true
+            sudo docker stop model-api || true
+            sudo docker rm model-api || true
+      
+            echo "Starting containers..."
+            sudo docker run -d --name model-api -p 8000:8000 ${{ secrets.DOCKER_USERNAME }}/model-api:latest
+            sudo docker run -d --name bot \
+              -p 8085:8085 \
+              -e BOT_TOKEN=${{ secrets.BOT_TOKEN }} \
+              -e MESSAGE_DB_PATH=${{ secrets.MESSAGE_DB_PATH }} \
+              -e LISTENER_DB_PATH=${{ secrets.LISTENER_DB_PATH }} \
+              -e CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }} \
+              -e TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} \
+              -e MODEL_API_URL=http://<VM_IP>:8000 \
+              ${{ secrets.DOCKER_USERNAME }}/bot:latest
