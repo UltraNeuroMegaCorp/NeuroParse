@@ -18,7 +18,7 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
-            sudo tee .env > /dev/null <<EOF
+            tee .env > /dev/null <<EOF
             BOT_TOKEN=${{ secrets.BOT_TOKEN }} > .env
             MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }} >> .env
             LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }} >> .env
