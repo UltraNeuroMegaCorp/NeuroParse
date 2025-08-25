@@ -18,16 +18,14 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            sudo cd /root/snap
-            sudo cat <<EOF > app.env
-            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
-            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
-            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
-            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
-            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
-            MODEL_API_URL=${{ vars.MODEL_API_URL }}
-            EOF
-            sudo chmod 600 app.env
+            cd /home/${{ secrets.HOST_USER }}
+
+            export BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            export MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
+            export LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
+            export CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
+            export TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            export MODEL_API_URL=${{ vars.MODEL_API_URL }}
 
   deploy:
     name: Deploy Containers
@@ -44,13 +42,10 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}
 
             echo "Pulling images..."
-            sudo docker-compose --env-file /root/snap/app.env pull
+            sudo docker-compose pull
             
             echo "Stopping old containers..."
-            sudo docker-compose --env-file /root/snap/app.env down
+            sudo docker-compose down
             
             echo "Starting containers..."
-            sudo docker-compose --env-file /root/snap/app.env up -d --remove-orphans
-
-            echo "Deleting .env..."
-            sudo rm -rf /root/snap/app.env
+            sudo docker-compose up -d --remove-orphans
