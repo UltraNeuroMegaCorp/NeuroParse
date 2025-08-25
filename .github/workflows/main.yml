@@ -6,8 +6,8 @@ on:
       - master
 
 jobs:
-  create-env:
-    name: Create .env on VM
+  create-environment:
+    name: Create environment vars on VM
     runs-on: ubuntu-latest
     environment: production
     steps:
@@ -30,7 +30,7 @@ jobs:
   deploy:
     name: Deploy Containers
     runs-on: ubuntu-latest
-    needs: create-env
+    needs: create-environment
     steps:
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
