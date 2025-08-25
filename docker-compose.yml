@@ -6,7 +6,7 @@ services:
     depends_on:
       - model-api
     env_file:
-      - .env
+      - app.env
     ports:
       - "8085:8085"
     restart: always
