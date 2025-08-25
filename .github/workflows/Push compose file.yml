@@ -1,0 +1,27 @@
+name: Copy docker-compose.yml
+
+on:
+  workflow_run:
+    workflows: ["Build and Push Images"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOST_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Copy file to VM
+        run: |
+          scp -o StrictHostKeyChecking=no \
+              -i ~/.ssh/id_rsa \
+              ./docker-compose.yml \
+              ${{ secrets.HOST_USER }}@${{ secrets.HOST_IP }}:/home/${{ secrets.HOST_USER }}/
