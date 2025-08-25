@@ -19,16 +19,15 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
-            tee .env > /dev/null <<EOF
-            BOT_TOKEN=${{ secrets.BOT_TOKEN }} > .env
-            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }} >> .env
-            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }} >> .env
-            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }} >> .env
-            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} >> .env
-            MODEL_API_URL=${{ vars.MODEL_API_URL }} >> .env 
+            cat <<EOF > app.env
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
+            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
+            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
+            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            MODEL_API_URL=${{ vars.MODEL_API_URL }}
             EOF
-            cat .env
-            sudo chmod 777 .env
+            chmod 600 app.env
 
   deploy:
     name: Deploy Containers
@@ -43,17 +42,16 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
-            cat .env
             echo "Проверка файлов в директории..."
             ls -la
             echo "Pulling images..."
-            sudo docker-compose --env-file .env pull
+            sudo docker-compose --env-file app.env pull
             
             echo "Stopping old containers..."
-            sudo docker-compose --env-file .env down
+            sudo docker-compose --env-file app.env down
             
             echo "Starting containers..."
-            sudo docker-compose --env-file .env up -d --remove-orphans
+            sudo docker-compose --env-file app.env up -d --remove-orphans
 
             echo "Deleting .env..."
-            sudo rm -rf .env
+            sudo rm -rf app.env
