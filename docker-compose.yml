@@ -3,13 +3,6 @@ services:
     image: tomsh666/bot:latest
     depends_on:
       - model-api
-    environment:
-      BOT_TOKEN: ${BOT_TOKEN}
-      MESSAGE_DB_PATH: ${MESSAGE_DB_PATH}
-      LISTENER_DB_PATH: ${LISTENER_DB_PATH}
-      CONTROL_CHAT_ID: ${CONTROL_CHAT_ID}
-      TARGET_CHAT_ID: ${TARGET_CHAT_ID}
-      MODEL_API_URL: ${MODEL_API_URL}
     ports:
       - "8085:8085"
     restart: always
