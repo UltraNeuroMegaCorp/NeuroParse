@@ -26,7 +26,3 @@ async def transcribe(file: UploadFile = File(...)):
         os.remove(file_path)
     return {"text": text}
 
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
-
