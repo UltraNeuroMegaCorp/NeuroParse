@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   workflow_run:
-    workflows: ["Copy docker-compose.yml"]
+    workflows: ["Create .env file"]
     types:
       - completed
 
