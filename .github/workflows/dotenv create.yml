@@ -1,0 +1,26 @@
+name: Create .env file
+on:
+  workflow_run:
+    workflows: [Copy docker-compose.yml"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: SSH to VM and create .env
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USER }}
+          key: ${{ secrets.HOST_SSH_KEY }}
+          script: |
+            echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
+            echo "MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}" >> .env
+            echo "LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}" >> .env
+            echo "CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}" >> .env
+            echo "TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}" >> .env
+            echo "MODEL_API_URL=${{ vars.MODEL_API_URL }}" >> .env
+
