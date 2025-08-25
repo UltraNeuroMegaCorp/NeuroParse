@@ -42,8 +42,7 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
-            echo "Проверка файлов в директории..."
-            ls -la
+
             echo "Pulling images..."
             sudo docker-compose --env-file app.env pull
             
