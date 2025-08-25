@@ -44,13 +44,13 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}
 
             echo "Pulling images..."
-            sudo docker-compose --env-file app.env pull
+            sudo docker-compose --env-file /home/${{ secrets.HOST_USER }}/app.env pull
             
             echo "Stopping old containers..."
-            sudo docker-compose --env-file app.env down
+            sudo docker-compose --env-file /home/${{ secrets.HOST_USER }}/app.env down
             
             echo "Starting containers..."
-            sudo docker-compose --env-file app.env up -d --remove-orphans
+            sudo docker-compose --env-file /home/${{ secrets.HOST_USER }}/app.env up -d --remove-orphans
 
             echo "Deleting .env..."
             sudo rm -rf app.env
