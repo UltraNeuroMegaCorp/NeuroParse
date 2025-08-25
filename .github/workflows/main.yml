@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            cd /root/snap
+            sudo cd /root/snap
             sudo cat <<EOF > app.env
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
