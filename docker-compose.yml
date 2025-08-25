@@ -9,7 +9,8 @@ services:
       - TARGET_CHAT_ID=${TARGET_CHAT_ID}
       - MODEL_API_URL=${MODEL_API_URL}
     depends_on:
-      - model-api
+      model-api:
+        condition: service_healthy
     env_file:
       - app.env
     ports:
@@ -23,6 +24,10 @@ services:
     ports:
       - "8086:8086"
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 5s
+      retries: 5
     networks:
       - app_network
 
