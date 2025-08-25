@@ -9,6 +9,7 @@ jobs:
   create-env:
     name: Create .env on VM
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: SSH to VM and create .env
         uses: appleboy/ssh-action@v1
