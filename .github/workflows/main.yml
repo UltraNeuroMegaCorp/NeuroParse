@@ -18,12 +18,16 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            export BOT_TOKEN=${{ secrets.BOT_TOKEN }}
-            export MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
-            export LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
-            export CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
-            export TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
-            export MODEL_API_URL=${{ vars.MODEL_API_URL }}
+            cd /home/${{ secrets.HOST_USER }}
+            cat <<EOF > app.env
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
+            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
+            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
+            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            MODEL_API_URL=${{ vars.MODEL_API_URL }}
+            EOF
+            chmod 600 app.env
 
   deploy:
     name: Deploy Containers
@@ -40,10 +44,13 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}
 
             echo "Pulling images..."
-            sudo docker-compose pull
+            sudo docker-compose --env-file app.env pull
             
             echo "Stopping old containers..."
-            sudo docker-compose down
+            sudo docker-compose --env-file app.env down
             
             echo "Starting containers..."
-            sudo docker-compose -d --remove-orphans
+            sudo docker-compose --env-file app.env up -d --remove-orphans
+
+            echo "Deleting .env..."
+            sudo rm -rf app.env
