@@ -76,6 +76,8 @@ jobs:
             echo "CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}" >> .env
             echo "TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}" >> .env
             echo "MODEL_API_URL=${{ vars.MODEL_API_URL }}" >> .env
+            chown ${{ secrets.HOST_USER }}:${{ secrets.HOST_USER }} .env
+            chmod 600 .env
 
   deploy:
     name: Deploy Containers
@@ -90,6 +92,8 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
+            echo "Проверка файлов в директории..."
+            ls -la
             echo "Pulling images..."
             sudo docker-compose --env-file .env pull
             
