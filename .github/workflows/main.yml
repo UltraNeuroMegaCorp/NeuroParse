@@ -70,14 +70,14 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
-            echo "BOT_TOKEN=${{ secrets.BOT_TOKEN }}" > .env
-            echo "MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}" >> .env
-            echo "LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}" >> .env
-            echo "CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}" >> .env
-            echo "TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}" >> .env
-            echo "MODEL_API_URL=${{ vars.MODEL_API_URL }}" >> .env
-            chown ${{ secrets.HOST_USER }}:${{ secrets.HOST_USER }} .env
-            chmod 600 .env
+            sudo tee .env > /dev/null <<EOF
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }} > .env
+            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }} >> .env
+            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }} >> .env
+            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }} >> .env
+            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} >> .env
+            MODEL_API_URL=${{ vars.MODEL_API_URL }} >> .env 
+            EOF
 
   deploy:
     name: Deploy Containers
