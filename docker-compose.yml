@@ -2,18 +2,11 @@ version: '3.8'
 
 services:
   bot:
-    build:
-      context: ./bot
-      dockerfile: Dockerfile
+    image: tomsh666/bot:latest
     depends_on:
       - model-api
-    environment:
-      - BOT_TOKEN=${BOT_TOKEN}
-      - MESSAGE_DB_PATH=${MESSAGE_DB_PATH}
-      - LISTENER_DB_PATH=${LISTENER_DB_PATH}
-      - CONTROL_CHAT_ID=${CONTROL_CHAT_ID}
-      - TARGET_CHAT_ID=${TARGET_CHAT_ID}
-      - MODEL_API_URL=${MODEL_API_URL}
+    env_file:
+      - .env
     ports:
       - "8085:8085"
     restart: always
@@ -21,9 +14,7 @@ services:
       - app_network
 
   model-api:
-    build:
-      context: ./model_api
-      dockerfile: Dockerfile
+    image: tomsh666/model-api:latest
     ports:
       - "8086:8086"
     restart: always
