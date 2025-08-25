@@ -10,6 +10,8 @@ services:
       - MODEL_API_URL=${MODEL_API_URL}
     depends_on:
       - model-api
+    env_file:
+      - app.env
     ports:
       - "8085:8085"
     restart: always

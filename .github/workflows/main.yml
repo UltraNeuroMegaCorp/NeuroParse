@@ -18,13 +18,15 @@ jobs:
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
             cd /home/${{ secrets.HOST_USER }}
-
-            export BOT_TOKEN=${{ secrets.BOT_TOKEN }}
-            export MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
-            export LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
-            export CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
-            export TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
-            export MODEL_API_URL=${{ vars.MODEL_API_URL }}
+            cat <<EOF > app.env
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            MESSAGE_DB_PATH=${{ secrets.MESSAGE_DB_PATH }}
+            LISTENER_DB_PATH=${{ secrets.LISTENER_DB_PATH }}
+            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
+            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            MODEL_API_URL=${{ secrets.MODEL_API_URL }}
+            EOF
+            chmod 600 app.env
 
             echo "Pulling images..."
             sudo docker-compose pull
@@ -33,10 +35,4 @@ jobs:
             sudo docker-compose down
             
             echo "Starting containers..."
-            sudo env BOT_TOKEN=$BOT_TOKEN \
-                   MESSAGE_DB_PATH=$MESSAGE_DB_PATH \
-                   LISTENER_DB_PATH=$LISTENER_DB_PATH \
-                   CONTROL_CHAT_ID=$CONTROL_CHAT_ID \
-                   TARGET_CHAT_ID=$TARGET_CHAT_ID \
-                   MODEL_API_URL=$MODEL_API_URL \
-                   docker-compose up -d --remove-orphans
+            sudo docker-compose up -d --remove-orphans
