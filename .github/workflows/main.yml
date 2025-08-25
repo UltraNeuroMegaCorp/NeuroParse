@@ -78,8 +78,7 @@ jobs:
             TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }} >> .env
             MODEL_API_URL=${{ vars.MODEL_API_URL }} >> .env 
             EOF
-            sudo chown $USER:$USER .env
-            chmod u+rw .env
+            chmod 666 .env
 
   deploy:
     name: Deploy Containers
