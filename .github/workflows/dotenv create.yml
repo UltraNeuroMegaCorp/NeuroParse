@@ -1,7 +1,7 @@
 name: Create .env file
 on:
   workflow_run:
-    workflows: [Copy docker-compose.yml"]
+    workflows: ["Copy docker-compose.yml"]
     types:
       - completed
 
