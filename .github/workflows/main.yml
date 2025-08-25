@@ -9,6 +9,7 @@ jobs:
   deploy:
     name: Deploy Containers
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.3
@@ -20,11 +21,11 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}
             cat <<EOF > app.env
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
-            MESSAGE_DB_PATH=${{ secrets.MESSAGE_DB_PATH }}
-            LISTENER_DB_PATH=${{ secrets.LISTENER_DB_PATH }}
+            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
+            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
             CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
             TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
-            MODEL_API_URL=${{ secrets.MODEL_API_URL }}
+            MODEL_API_URL=${{ vars.MODEL_API_URL }}
             EOF
             chmod 600 app.env
 
