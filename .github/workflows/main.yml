@@ -18,7 +18,7 @@ jobs:
           username: ${{ secrets.HOST_USER }}
           key: ${{ secrets.HOST_SSH_KEY }}
           script: |
-            cd /home/${{ secrets.HOST_USER }}
+            cd /root/snap
             cat <<EOF > app.env
             BOT_TOKEN=${{ secrets.BOT_TOKEN }}
             MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
@@ -44,13 +44,13 @@ jobs:
             cd /home/${{ secrets.HOST_USER }}
 
             echo "Pulling images..."
-            sudo docker-compose --env-file app.env pull
+            sudo docker-compose --env-file /root/snap/app.env pull
             
             echo "Stopping old containers..."
-            sudo docker-compose --env-file app.env down
+            sudo docker-compose --env-file /root/snap/app.env down
             
             echo "Starting containers..."
-            sudo docker-compose --env-file app.env up -d --remove-orphans
+            sudo docker-compose --env-file /root/snap/app.env up -d --remove-orphans
 
             echo "Deleting .env..."
-            sudo rm -rf app.env
+            sudo rm -rf /root/snap/app.env
