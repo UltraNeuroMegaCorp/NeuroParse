@@ -1,0 +1,39 @@
+name: test workflow
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Containers
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST_IP }}
+          username: ${{ secrets.HOST_USER }}
+          key: ${{ secrets.HOST_SSH_KEY }}
+          script: |
+            cd /home/${{ secrets.HOST_USER }}
+            cat <<EOF > app.env
+            BOT_TOKEN=${{ secrets.BOT_TOKEN }}
+            MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
+            LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
+            CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
+            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            MODEL_API_URL=${{ vars.MODEL_API_URL }}
+            EOF
+            chmod 600 app.env
+            echo "Pulling images..."
+            sudo docker-compose pull
+
+            cat /home/${{ secrets.HOST_USER }}/app.env
+            echo "MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}"
+            
+            echo "Stopping old containers..."
+            sudo docker-compose down
+            
+            echo "Starting containers..."
+            sudo docker-compose up -d --remove-orphans
