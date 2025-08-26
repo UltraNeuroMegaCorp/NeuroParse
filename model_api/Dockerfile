@@ -14,5 +14,5 @@ COPY .. .
 
 RUN mkdir -p /app/voice_messages
 
-CMD ["gunicorn", "model_api:app", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8086", "--preload"]
+CMD ["gunicorn", "model_api:app", "--workers", "2", "--worker-class", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8086"]
 
