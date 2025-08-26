@@ -17,6 +17,8 @@ services:
     restart: always
     networks:
       - app_network
+    volumes:
+      - ./data:/data
 
   model-api:
     image: tomsh666/model-api:latest
@@ -25,8 +27,6 @@ services:
     restart: always
     networks:
       - app_network
-    volumes:
-      - ./data:/data
 
 networks:
   app_network:
