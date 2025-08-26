@@ -1,5 +1,4 @@
 openai-whisper
 fastapi
-gunicorn
 uvicorn
 python-multipart

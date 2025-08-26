@@ -25,6 +25,8 @@ services:
     restart: always
     networks:
       - app_network
+    volumes:
+      - ./data:/data
 
 networks:
   app_network:
