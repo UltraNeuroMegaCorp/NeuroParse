@@ -9,8 +9,7 @@ services:
       - TARGET_CHAT_ID=${TARGET_CHAT_ID}
       - MODEL_API_URL=${MODEL_API_URL}
     depends_on:
-      model-api:
-        condition: service_healthy
+      - model-api
     env_file:
       - app.env
     ports:
