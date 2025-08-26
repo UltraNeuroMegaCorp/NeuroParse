@@ -80,11 +80,11 @@ jobs:
             EOF
             chmod 600 app.env
 
-            echo "Pulling images..."
-            sudo docker-compose --env-file app.env pull
-            
             echo "Stopping old containers..."
             sudo docker-compose --env-file app.env down
+
+            echo "Pulling images..."
+            sudo docker-compose --env-file app.env pull
             
             echo "Starting containers..."
             sudo docker-compose --env-file app.env up -d --remove-orphans
