@@ -12,7 +12,7 @@ from models import Listener, Message
 
 VOICES_DIR = "voice_messages"
 os.makedirs(VOICES_DIR, exist_ok=True)
-TARGET_CHAT_IDS = [int(x) for x in TARGET_CHAT_IDS.split(",")]
+TARGET_CHAT_IDS = [int(chat_id.strip()) for chat_id in TARGET_CHAT_IDS.split(",") if chat_id.strip()]
 
 
 def save_message(msg, text, db_model):
