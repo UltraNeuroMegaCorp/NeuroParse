@@ -75,7 +75,7 @@ jobs:
             MESSAGE_DB_PATH=${{ vars.MESSAGE_DB_PATH }}
             LISTENER_DB_PATH=${{ vars.LISTENER_DB_PATH }}
             CONTROL_CHAT_ID=${{ secrets.CONTROL_CHAT_ID }}
-            TARGET_CHAT_ID=${{ secrets.TARGET_CHAT_ID }}
+            TARGET_CHAT_IDS=${{ secrets.TARGET_CHAT_IDS }}
             MODEL_API_URL=${{ vars.MODEL_API_URL }}
             EOF
             chmod 600 app.env
