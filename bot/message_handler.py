@@ -1,4 +1,3 @@
-import asyncio
 import os
 import uuid
 
@@ -6,13 +5,14 @@ import requests
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from config import TARGET_CHAT_ID, MODEL_API_URL
+from config import TARGET_CHAT_IDS, MODEL_API_URL
 from db import SessionLocalListener, SessionLocalMessage
 from db_handlers import DbHandler
 from models import Listener, Message
 
 VOICES_DIR = "voice_messages"
 os.makedirs(VOICES_DIR, exist_ok=True)
+TARGET_CHAT_IDS = [int(x) for x in TARGET_CHAT_IDS.split(",")]
 
 
 def save_message(msg, text, db_model):
@@ -44,7 +44,7 @@ def save_message(msg, text, db_model):
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     msg = update.message
-    if not msg or msg.chat.id != int(TARGET_CHAT_ID):
+    if not msg or msg.chat.id not in TARGET_CHAT_IDS:
         return
 
     username = msg.from_user.username or msg.from_user.first_name
